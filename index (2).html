@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DELVI - Hill Cipher System</title>
+    <!-- Font bergaya teknologi -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Library untuk merender Flowchart -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ea;
+            --neon-green: #39ff14;
+            --text-main: #c9d1d9;
+            --border-color: #30363d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 15px;
+            min-height: 100vh;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: var(--neon-pink);
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--neon-cyan);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* --- STYLE FLOWCHART --- */
+        .mermaid-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        /* --- STYLE APLIKASI --- */
+        .app-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task-panel {
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .task-title {
+            color: var(--neon-pink);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 0, 234, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .input-group { margin-bottom: 15px; }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--neon-green);
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+        }
+
+        input[readonly] { color: #8b949e; cursor: not-allowed; }
+
+        .matrix-row { display: flex; gap: 10px; }
+        .matrix-row input { text-align: center; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            color: var(--neon-cyan);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--neon-cyan);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(57, 255, 20, 0.05);
+            border: 1px solid var(--neon-green);
+            border-radius: 4px;
+            display: none;
+        }
+
+        .result-panel p {
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 5px;
+        }
+
+        .result-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: var(--neon-green);
+            word-break: break-all;
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+            margin-bottom: 15px;
+        }
+
+        .result-text.decrypt {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px rgba(255, 0, 234, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>HILL CIPHER</h1>
+    <div class="subtitle">SYSTEM & FLOWCHART DASHBOARD</div>
+
+    <!-- BAGIAN 1: FLOWCHART ENKRIPSI -->
+    <div class="container">
+        <div class="section-title">FLOWCHART ENKRIPSI</div>
+        <div class="mermaid-container">
+            <pre class="mermaid">
+                graph TD
+                classDef startend fill:#0d1117,stroke:#00f3ff,stroke-width:3px,color:#00f3ff,font-weight:bold,font-family:monospace;
+                classDef process fill:#161b22,stroke:#ff00ea,stroke-width:2px,color:#c9d1d9,font-family:monospace;
+                classDef decision fill:#161b22,stroke:#39ff14,stroke-width:2px,color:#39ff14,font-family:monospace;
+                classDef io fill:#0d1117,stroke:#ff00ea,stroke-width:2px,color:#ff00ea,stroke-dasharray: 5 5,font-family:monospace;
+            
+                A([MULAI]):::startend --> B[/INPUT PLAINTEXT/]:::io
+                B --> C[UPPERCASE & HAPUS SPASI]:::process
+                C --> D{PANJANG GANJIL?}:::decision
+                D -- YA --> E[TAMBAH PADDING 'X']:::process
+                D -- TIDAK --> F[LOOP PER 2 HURUF]:::process
+                E --> F
+                F --> G[KONVERSI HURUF KE ANGKA 0-25]:::process
+                G --> H[/INPUT MATRIKS KUNCI 2x2/]:::io
+                H --> I[PERKALIAN MATRIKS K x P]:::process
+                I --> J[MODULO 26]:::process
+                J --> K[KONVERSI ANGKA KE HURUF]:::process
+                K --> L[/OUTPUT CIPHERTEXT/]:::io
+                L --> M([SELESAI]):::startend
+            </pre>
+        </div>
+    </div>
+
+    <!-- BAGIAN 2: FLOWCHART DEKRIPSI -->
+    <div class="container">
+        <div class="section-title">FLOWCHART DEKRIPSI</div>
+        <div class="mermaid-container">
+            <pre class="mermaid">
+                graph TD
+                classDef startend fill:#0d1117,stroke:#00f3ff,stroke-width:3px,color:#00f3ff,font-weight:bold,font-family:monospace;
+                classDef process fill:#161b22,stroke:#ff00ea,stroke-width:2px,color:#c9d1d9,font-family:monospace;
+                classDef io fill:#0d1117,stroke:#ff00ea,stroke-width:2px,color:#ff00ea,stroke-dasharray: 5 5,font-family:monospace;
+                classDef math fill:#161b22,stroke:#39ff14,stroke-width:2px,color:#39ff14,font-family:monospace;
+            
+                A([MULAI]):::startend --> B[/INPUT CIPHERTEXT/]:::io
+                B --> C[UPPERCASE & HAPUS SPASI]:::process
+                C --> D[LOOP PER 2 HURUF]:::process
+                D --> E[KONVERSI HURUF KE ANGKA 0-25]:::process
+                E --> F[/INPUT MATRIKS KUNCI 2x2/]:::io
+                F --> G[HITUNG DETERMINAN]:::math
+                G --> H[CARI INVERSE MOD 26]:::math
+                H --> I[CARI ADJOIN MATRIKS]:::math
+                I --> J[MATRIKS K-INVERS]:::math
+                J --> K[PERKALIAN MATRIKS K-INVERS x C]:::process
+                K --> L[MODULO 26]:::process
+                L --> M[KONVERSI ANGKA KE HURUF]:::process
+                M --> N[/OUTPUT PLAINTEXT/]:::io
+                N --> O([SELESAI]):::startend
+            </pre>
+        </div>
+    </div>
+
+    <!-- BAGIAN 3: APLIKASI -->
+    <div class="container">
+        <div class="section-title">SISTEM APLIKASI</div>
+        
+        <div class="app-section">
+            <!-- TUGAS 1 -->
+            <div class="task-panel">
+                <div class="task-title">>> PROSES 1: HILL CIPHER TIDAK SULIT</div>
+                
+                <div class="input-group">
+                    <label>[ PLAINTEXT ]</label>
+                    <input type="text" id="text1" value="HILL CIPHER TIDAK SULIT" readonly>
+                </div>
+        
+                <div class="input-group">
+                    <label>[ MATRIKS KUNCI 2x2 ]</label>
+                    <div class="matrix-row">
+                        <input type="number" id="k1_1" value="5" readonly> 
+                        <input type="number" id="k1_2" value="6" readonly>
+                    </div>
+                    <div class="matrix-row" style="margin-top: 5px;">
+                        <input type="number" id="k1_3" value="2" readonly> 
+                        <input type="number" id="k1_4" value="3" readonly>
+                    </div>
+                </div>
+        
+                <button onclick="prosesTugas1()">Execute Encryption</button>
+        
+                <div class="result-panel" id="result1">
+                    <p>[ CIPHERTEXT ]</p>
+                    <div class="result-text" id="cipher1"></div>
+                    <p>[ DECRYPTED BACK ]</p>
+                    <div class="result-text decrypt" id="decrypt1"></div>
+                </div>
+            </div>
+        
+            <!-- TUGAS 2 -->
+            <div class="task-panel">
+                <div class="task-title">>> PROSES 2: SAYA PUSING</div>
+                
+                <div class="input-group">
+                    <label>[ PLAINTEXT ]</label>
+                    <input type="text" id="text2" value="SAYA PUSING" readonly>
+                </div>
+        
+                <div class="input-group">
+                    <label>[ MATRIKS KUNCI 2x2 ]</label>
+                    <div class="matrix-row">
+                        <input type="number" id="k2_1" value="5" readonly> 
+                        <input type="number" id="k2_2" value="8" readonly>
+                    </div>
+                    <div class="matrix-row" style="margin-top: 5px;">
+                        <input type="number" id="k2_3" value="17" readonly> 
+                        <input type="number" id="k2_4" value="3" readonly>
+                    </div>
+                </div>
+        
+                <button onclick="prosesTugas2()">Execute Encryption</button>
+        
+                <div class="result-panel" id="result2">
+                    <p>[ CIPHERTEXT ]</p>
+                    <div class="result-text" id="cipher2"></div>
+                    <p>[ DECRYPTED BACK ]</p>
+                    <div class="result-text decrypt" id="decrypt2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA APLIKASI & INISIALISASI FLOWCHART -->
+    <script>
+        // 1. Inisialisasi Flowchart Mermaid
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+
+        // 2. Logika Hill Cipher
+        function charToInt(char) {
+            return char.toUpperCase().charCodeAt(0) - 65;
+        }
+
+        function intToChar(num) {
+            return String.fromCharCode((num % 26 + 26) % 26 + 65);
+        }
+
+        function modInverse(a, m) {
+            a = (a % m + m) % m;
+            for (let x = 1; x < m; x++) {
+                if ((a * x) % m === 1) return x;
+            }
+            return null;
+        }
+
+        function hitungHill(teks, key, mode) {
+            let text = teks.replace(/ /g, "").toUpperCase();
+            if (text.length % 2 !== 0) text += 'X';
+
+            let result = "";
+            let K = key;
+
+            if (mode === 'decrypt') {
+                let det = (K[0][0] * K[1][1] - K[0][1] * K[1][0]) % 26;
+                let invDet = modInverse(det, 26);
+                if (invDet === null) return "ERROR: MATRIKS TIDAK VALID!";
+                
+                let adj = [
+                    [(K[1][1] * invDet) % 26, (-K[0][1] * invDet) % 26],
+                    [(-K[1][0] * invDet) % 26, (K[0][0] * invDet) % 26]
+                ];
+                K = [
+                    [(adj[0][0] + 26) % 26, (adj[0][1] + 26) % 26],
+                    [(adj[1][0] + 26) % 26, (adj[1][1] + 26) % 26]
+                ];
+            }
+
+            for (let i = 0; i < text.length; i += 2) {
+                let p1 = charToInt(text[i]);
+                let p2 = charToInt(text[i+1]);
+
+                let c1 = (K[0][0] * p1 + K[0][1] * p2) % 26;
+                let c2 = (K[1][0] * p1 + K[1][1] * p2) % 26;
+
+                result += intToChar(c1) + intToChar(c2);
+            }
+            return result;
+        }
+
+        function prosesTugas1() {
+            let text = document.getElementById("text1").value;
+            let key = [
+                [parseInt(document.getElementById("k1_1").value), parseInt(document.getElementById("k1_2").value)],
+                [parseInt(document.getElementById("k1_3").value), parseInt(document.getElementById("k1_4").value)]
+            ];
+
+            let cipher = hitungHill(text, key, 'encrypt');
+            let decrypt = hitungHill(cipher, key, 'decrypt');
+
+            document.getElementById("cipher1").innerText = cipher;
+            document.getElementById("decrypt1").innerText = decrypt;
+            document.getElementById("result1").style.display = "block";
+        }
+
+        function prosesTugas2() {
+            let text = document.getElementById("text2").value;
+            let key = [
+                [parseInt(document.getElementById("k2_1").value), parseInt(document.getElementById("k2_2").value)],
+                [parseInt(document.getElementById("k2_3").value), parseInt(document.getElementById("k2_4").value)]
+            ];
+
+            let cipher = hitungHill(text, key, 'encrypt');
+            let decrypt = hitungHill(cipher, key, 'decrypt');
+
+            document.getElementById("cipher2").innerText = cipher;
+            document.getElementById("decrypt2").innerText = decrypt;
+            document.getElementById("result2").style.display = "block";
+        }
+    </script>
+</body>
+</html>
